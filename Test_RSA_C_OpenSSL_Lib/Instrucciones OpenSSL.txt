@@ -1,0 +1,80 @@
+//////////////////////////////////////////////////////
+///  INSTRUCCIONES DE CÓMO INSTALAR OPENSSL 3.1.0  ///
+//////////////////////////////////////////////////////
+
+PÁGINA CON LINKS DE DESCARGA E INFO DE CONFIGURACIÓN DE OPENSSL 3.1.0
+En este artículo están los links de descarga e info de "instalación" (solo es copiar carpetas y ficheros si bajas la version ya compilada). También vienen las instrucciones de configuración de variables de entorno y de visual studio para compilar tus proyectos (justo lo que necesitamos)
+
+Link:
+https://kb.firedaemon.com/support/solutions/articles/4000121705-openssl-3-1-3-0-and-1-1-1-binary-distributions-for-microsoft-windows
+
+
+ENVIRONMENT VARIABLES
+Añadir variables de entorno (yo lo hice desde interfaz gráfica):
+	set OPENSSL_HOME=C:\OpenSSL
+	set OPENSSL_CONF=%OPENSSL_HOME%\ssl\openssl.cnf
+	set PATH=%OPENSSL_HOME%\bin;%PATH%
+
+
+VISUAL STUDIO
+Additional Include Directories
+	Prepend "C:\Program Files\FireDaemon Open SSL 3\include"; to Property Pages -> C/C++ -> General -> Additional Include Directories in your project.
+	En mi caso es "C:\Program Files\OpenSSL\include"
+
+
+Additional Library Directories
+	Prepend "C:\Program Files\FireDaemon Open SSL 3\lib"; to Property Pages -> Linker -> General -> Additional Library Directories in your project.
+	En mi caso es "C:\Program Files\OpenSSL\lib"
+
+
+
+OTROS LINKS
+Página oficial de OpenSSL:
+https://www.openssl.org/source/
+
+Repo GitHub oficial de OpenSSL:
+https://github.com/openssl/openssl
+
+API de OpenSSL 3.1:
+https://www.openssl.org/docs/man3.1/man3/
+
+Ejemplo de write/read con key privada y publica en OpenSSL 3.1 y 1.1 y explicación de sign/verify.
+https://github.com/openssl/openssl/issues/20493
+
+OpenSSL 3.0:
+https://stackoverflow.com/questions/17400058/how-to-use-openssl-lib-pem-read-to-read-public-private-key-from-a-string
+
+Vídeo de como instalar (no lo llegué a usar):
+https://www.youtube.com/watch?v=eLb0w1uGxUE
+
+
+   .       .       .                                          .       .       .    
+  / \     / \     / \   //////////////////////////////////   / \     / \     / \   
+ / | \   / | \   / | \  ///  NOTAS Y POSIBLES ERRORES  ///  / | \   / | \   / | \  
+/__o__\ /__o__\ /__o__\ ////////////////////////////////// /__o__\ /__o__\ /__o__\ 
+
+Si te sale error por los fopen() en lugar de cambiarlos a fopen_s(), que a veces no se puede porque están en módulos internos, se puede hacer lo siguiente:
+	Select your project and click "Properties" in the context menu.
+	In the dialog, chose Configuration Properties -> C/C++ -> Preprocessor
+	In the field PreprocessorDefinitions add ;_CRT_SECURE_NO_WARNINGS to turn those warnings off.
+
+
+Para aceptar código de otras versiones de OpenSSL,  hay que definir OPENSSL_API_COMPAT con un código específico.
+	Link con info: https://www.openssl.org/docs/manmaster/man7/OPENSSL_API_COMPAT.html
+	Ejemplo para permitir compatibilidad con la versión 1.1.x:
+		#define OPENSSL_API_COMPAT 0x10100000L
+
+
+Para que te coja las librerías si te da error hay que usar estas pragmas:
+	#pragma comment(lib, "libssl.lib")
+	#pragma comment(lib, "libcrypto.lib")
+
+
+Para ver los códigos de error, texto sobre los errores o directamente trazas hay que incluir estas cabeceras:
+	#include <openssl/err.h>
+	#include <openssl/ssl.h>
+Llamar al inicio del programa (en el main) estas funciones:
+	SSL_load_error_strings();
+	ERR_load_crypto_strings();
+Y para printar los errores cuando los detectes hacer:
+	printf("Error --> %s\n", ERR_error_string(ERR_get_error(), NULL));
