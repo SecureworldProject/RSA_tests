@@ -10,7 +10,7 @@ https://kb.firedaemon.com/support/solutions/articles/4000121705-openssl-3-1-3-0-
 
 
 ENVIRONMENT VARIABLES
-Añadir variables de entorno (yo lo hice desde interfaz gráfica):
+Añadir/modificar variables de entorno. Deben coincidir con el directorio de OpenSSL, que puede ser otro. Se puede hacer desde interfaz gráfica o por línea de comandos:
 	set OPENSSL_HOME=C:\OpenSSL
 	set OPENSSL_CONF=%OPENSSL_HOME%\ssl\openssl.cnf
 	set PATH=%OPENSSL_HOME%\bin;%PATH%
@@ -19,12 +19,12 @@ Añadir variables de entorno (yo lo hice desde interfaz gráfica):
 VISUAL STUDIO
 Additional Include Directories
 	Prepend "C:\Program Files\FireDaemon Open SSL 3\include"; to Property Pages -> C/C++ -> General -> Additional Include Directories in your project.
-	En mi caso es "C:\Program Files\OpenSSL\include"
+	En mi caso es "$(OPENSSL_HOME)\include" que se traduce por "C:\Program Files\OpenSSL\include"
 
 
 Additional Library Directories
 	Prepend "C:\Program Files\FireDaemon Open SSL 3\lib"; to Property Pages -> Linker -> General -> Additional Library Directories in your project.
-	En mi caso es "C:\Program Files\OpenSSL\lib"
+	En mi caso es "$(OPENSSL_HOME)\lib" que se traduce por "C:\Program Files\OpenSSL\lib"
 
 
 
