@@ -200,12 +200,14 @@ int main() {
 	encrypted_text = (unsigned char*)malloc(RSA_size(rsa_pub_key));
 	if (NULL == encrypted_text) {
 		printf("ERROR allocating memory for encrypted_text buffer\n");
+		return 1;
 	}
 #pragma warning(suppress : 4996)
 	encrypted_text_size = RSA_public_encrypt(test_text_size, test_text, encrypted_text, rsa_pub_key, RSA_PKCS1_OAEP_PADDING);
 	if (-1 == encrypted_text_size) {
 		err_code = ERR_get_error();
 		printf("ERROR encrypting --> %s\n", ERR_error_string(err_code, NULL));
+		return 1;
 	}
 
 	result = fopen_s(&f_test_file, test_file_name, "wb");
