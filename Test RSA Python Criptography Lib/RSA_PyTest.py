@@ -67,26 +67,32 @@ def save_keys_on_files(private_key, public_key, private_key_filename="private_ke
 		file.write(pem)
 
 
-def read_keys_from_files(private_key_filename="private_key_1", public_key_filename="public_key_1"):
+def read_keys_from_files(private_key_filename="", public_key_filename=""):
 	private_key = None
 	public_key = None
 
-	try:
-		with open(private_key_filename, "rb") as file:
-			private_key = serialization.load_pem_private_key(
-				file.read(),
-				password=None,
-			)
-	except Exception as e:
-		print("Error loading private key")
+	if private_key_filename:
+		try:
+			with open(private_key_filename, "rb") as file:
+				private_key = serialization.load_pem_private_key(
+					file.read(),
+					password=None,
+				)
+		except Exception as e:
+			print(f"Error: could not load private key (file: '{private_key_filename}')")
+	else:
+		print("Warning: private key file not specified")
 
-	try:
-		with open(public_key_filename, "rb") as file:
-			public_key = serialization.load_pem_public_key(
-				file.read(),
-			)
-	except Exception as e:
-		print("Error loading public key")
+	if public_key_filename:
+		try:
+			with open(public_key_filename, "rb") as file:
+				public_key = serialization.load_pem_public_key(
+					file.read(),
+				)
+		except Exception as e:
+			print(f"Error: could not load public key (file: '{public_key_filename}')")
+	else:
+		print("Warning: public key file not specified")
 
 
 	return (private_key, public_key)
@@ -158,6 +164,39 @@ def test_4_read_keys_files_and_decrypt_encrypted_file():
 	print(f"new_plaintext ({len(new_plaintext)}):\n{new_plaintext}\n")
 
 
+def test_3b():
+	# Read keys from files
+	(private_key, public_key) = read_keys_from_files(private_key_filename="keypair_mondragon_priv.pem", public_key_filename="keypair_mondragon_pub.pem")
+
+	# Cipher, decipher and test
+	test(private_key, public_key)
+
+
+def test_4b():
+	original_encrypted_text_file = "test_file_mondragon"
+	original_encrypted_text = None
+
+	# Read keys from files
+	(private_key, public_key) = read_keys_from_files(private_key_filename="keypair_mondragon_priv.pem", public_key_filename="")
+
+	# Read original_encrypted_text file
+	with open(original_encrypted_text_file, "rb") as file:
+		original_encrypted_text = file.read()
+
+	print(f"original_encrypted_text (size={len(original_encrypted_text)}): {original_encrypted_text}")
+
+	# Decrypt text
+	new_plaintext = private_key.decrypt(
+		original_encrypted_text,
+		padding.OAEP(
+			mgf=padding.MGF1(algorithm=hashes.SHA1()),
+			algorithm=hashes.SHA1(),
+			label=None
+		)
+	)
+	print(f"original_encrypted_text ({len(original_encrypted_text)}):\n{original_encrypted_text}\n")
+	print(f"new_plaintext ({len(new_plaintext)}):\n{new_plaintext}\n")
+
 
 
 ### MAIN ###
@@ -165,7 +204,8 @@ def test_4_read_keys_files_and_decrypt_encrypted_file():
 if __name__ == '__main__':
 
 	#tests_list = [test_1_standalone, test_2_write_read_keys_files, test_3_read_keys_files, test_4_read_keys_files_and_decrypt_encrypted_file]
-	tests_list = [test_3_read_keys_files, test_4_read_keys_files_and_decrypt_encrypted_file]
+	#tests_list = [test_3_read_keys_files, test_4_read_keys_files_and_decrypt_encrypted_file]
+	tests_list = [test_3b, test_4b]
 
 	for i in range(len(tests_list)):
 		print("\n________________________________________________________________________________\n")

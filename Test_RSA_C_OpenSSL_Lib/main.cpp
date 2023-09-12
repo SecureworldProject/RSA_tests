@@ -162,9 +162,9 @@ RSA* read_private_key(const char* private_key_filename) {
 
 
 int main() {
-	RSA* rsa_pub_key = NULL;
-	char pub_key_filename[] = "public_key_4";
-	char priv_key_filename[] = "private_key_4";
+	char pub_key_filename[] = "keypair_mondragon_pub.pem"; //"public_key_4";
+	char priv_key_filename[] = "keypair_mondragon_priv.pem"; //"private_key_4";
+	char test_file_name[] = "test_file_mondragon"; //"test_file";
 
 	unsigned char test_text[TEST_TEXT_SIZE] = "Esto es un texto de prueba. En algun lugar de la Mancha de cuyo nombre no quiero acordarme...";
 	unsigned char* encrypted_text = NULL;
@@ -173,10 +173,58 @@ int main() {
 	int encrypted_text_size = 0;
 	int decrypted_text_size = 0;
 
+	FILE* f_test_file = NULL;
+
 	unsigned long err_code = 0;
 	size_t result = 0;
+	RSA* rsa_keypair = NULL;
+	RSA* rsa_pub_key = NULL;
 
-	RSA* rsa_keypair = (RSA*)malloc(1 * sizeof(RSA*));
+
+
+	// ----------------------------------------------------------------------------------------------------
+	// ONLY CREATE A CIPHERED TESTING FILE OF 512 BYTES
+	// ----------------------------------------------------------------------------------------------------
+
+	rsa_pub_key = read_public_key(pub_key_filename);
+	if (NULL == rsa_pub_key) {
+		printf("ERROR: could not read pub key (%s)\n", pub_key_filename);
+		return 1;
+	}
+	printf("File with public key read.\n");
+#pragma warning(suppress : 4996)
+	printf("RSA_size: %d\n", RSA_size(rsa_pub_key));
+
+
+#pragma warning(suppress : 4996)
+	encrypted_text = (unsigned char*)malloc(RSA_size(rsa_pub_key));
+	if (NULL == encrypted_text) {
+		printf("ERROR allocating memory for encrypted_text buffer\n");
+	}
+#pragma warning(suppress : 4996)
+	encrypted_text_size = RSA_public_encrypt(test_text_size, test_text, encrypted_text, rsa_pub_key, RSA_PKCS1_OAEP_PADDING);
+	if (-1 == encrypted_text_size) {
+		err_code = ERR_get_error();
+		printf("ERROR encrypting --> %s\n", ERR_error_string(err_code, NULL));
+	}
+
+	result = fopen_s(&f_test_file, test_file_name, "wb");
+	if (0 == result) {
+		result = fwrite(encrypted_text, 1, encrypted_text_size, f_test_file);
+		if (encrypted_text_size == result) {
+			printf("Everything written to %s correctly\n", test_file_name);
+		} else {
+			printf("ERROR writing to %s\n", test_file_name);
+		}
+	} else {
+		printf("ERROR opening %s to write\n", test_file_name);
+	}
+
+	printf("END!");
+	return 0;
+	// ----------------------------------------------------------------------------------------------------
+
+	rsa_keypair = (RSA*)malloc(1 * sizeof(RSA*));
 	if (0 != generate_and_write_key(RSA_F4, KEY_BYTES_SIZE * 8, priv_key_filename, pub_key_filename, &rsa_keypair)) {
 		printf("ERROR...\n");
 	}
@@ -227,17 +275,16 @@ int main() {
 	printf("encrypted_text (size:%d):\n%.*s\n\n", encrypted_text_size, encrypted_text_size, (char*)encrypted_text);
 	printf("decrypted_text (size:%d):\n%.*s\n\n", decrypted_text_size, decrypted_text_size, (char*)decrypted_text);
 
-	FILE* f_test_file = NULL;
-	result = fopen_s(&f_test_file, "test_file", "wb");
+	result = fopen_s(&f_test_file, test_file_name, "wb");
 	if (0 == result) {
 		result = fwrite(encrypted_text, 1, encrypted_text_size, f_test_file);
 		if (encrypted_text_size == result) {
-			printf("Everything written to test_file correctly\n");
+			printf("Everything written to %s correctly\n", test_file_name);
 		} else {
-			printf("ERROR writing to test_file\n");
+			printf("ERROR writing to %s\n", test_file_name);
 		}
 	} else {
-		printf("ERROR opening test_file to write\n");
+		printf("ERROR opening %s to write\n", test_file_name);
 	}
 
 

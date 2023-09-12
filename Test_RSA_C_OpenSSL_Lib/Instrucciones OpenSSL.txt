@@ -59,7 +59,7 @@ Si te sale error por los fopen() en lugar de cambiarlos a fopen_s(), que a veces
 	In the field PreprocessorDefinitions add ;_CRT_SECURE_NO_WARNINGS to turn those warnings off.
 
 
-Para aceptar código de otras versiones de OpenSSL,  hay que definir OPENSSL_API_COMPAT con un código específico.
+Para aceptar código de otras versiones de OpenSSL, hay que definir OPENSSL_API_COMPAT con un código específico.
 	Link con info: https://www.openssl.org/docs/manmaster/man7/OPENSSL_API_COMPAT.html
 	Ejemplo para permitir compatibilidad con la versión 1.1.x:
 		#define OPENSSL_API_COMPAT 0x10100000L
