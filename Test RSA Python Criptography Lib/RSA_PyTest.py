@@ -148,7 +148,7 @@ def test_4_read_keys_files_and_decrypt_encrypted_file():
 	with open(original_encrypted_text_file, "rb") as file:
 		original_encrypted_text = file.read()
 
-	print(f"original_encrypted_text (size={len(original_encrypted_text)}): {original_encrypted_text}")
+	print(f"original_encrypted_text ({len(original_encrypted_text)} bytes):\n{original_encrypted_text}\n")
 
 
 	# Decrypt text
@@ -160,8 +160,7 @@ def test_4_read_keys_files_and_decrypt_encrypted_file():
 			label=None
 		)
 	)
-	print(f"original_encrypted_text ({len(original_encrypted_text)}):\n{original_encrypted_text}\n")
-	print(f"new_plaintext ({len(new_plaintext)}):\n{new_plaintext}\n")
+	print(f"new_plaintext ({len(new_plaintext)} bytes):\n{new_plaintext}\n")
 
 
 def test_3b():
@@ -183,7 +182,8 @@ def test_4b():
 	with open(original_encrypted_text_file, "rb") as file:
 		original_encrypted_text = file.read()
 
-	print(f"original_encrypted_text (size={len(original_encrypted_text)}): {original_encrypted_text}")
+	print(f"original_encrypted_text ({len(original_encrypted_text)} bytes):\n{original_encrypted_text}\n")
+
 
 	# Decrypt text
 	new_plaintext = private_key.decrypt(
@@ -194,8 +194,7 @@ def test_4b():
 			label=None
 		)
 	)
-	print(f"original_encrypted_text ({len(original_encrypted_text)}):\n{original_encrypted_text}\n")
-	print(f"new_plaintext ({len(new_plaintext)}):\n{new_plaintext}\n")
+	print(f"new_plaintext ({len(new_plaintext)} bytes):\n{new_plaintext}\n")
 
 
 
